@@ -1,2 +1,2 @@
-# app_escola_seg_proj_software
+# App para disciplina de Segurança em projeto de Software
 Repositório para construção do projeto de Segurança em Projeto de Software 
