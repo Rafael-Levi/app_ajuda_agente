@@ -32,6 +32,20 @@ task run
 ```bash
 pytest
 ```
+
+## 👥 Usuários e Acessos
+
+| Grupo         | Usuário         | Senha     | Permissões principais               |
+|---------------|-----------------|-----------|-------------------------------------|
+| Admin         | unifor          | 1234      | CRUD completo e gestão de usuários  |
+| Diretoria     | diretor         | direcao01 | Ver seus agendamentos, mudar status |
+| Coordenação   | coordenador     | coord123  | Ver seus agendamentos, mudar status |
+| Professor     | professorl      | profe123  | Ver seus agendamentos, mudar status |
+| Professor     | professor2      | profe123  | Gerenciar clientes e agendamentos   |
+
+
+
+
 # 📋 Planejamento e Requisitos
 ## ✅ Requisitos Funcionais
 
