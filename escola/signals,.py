@@ -14,12 +14,12 @@ def criar_grupos_e_permissoes(sender, **kwargs):
 
     codes_coord = [
         'add_agendamento','change_agendamento','delete_agendamento','view_agendamento',
-        'add_aluno','change_aluno','delete_aluno','view_aluno',
+        'add_aluno','change_aluno','delete_aluno','view_aluno','view_relatorio','export_relatorio',
     ]
     coord_perms = Permission.objects.filter(codename__in=codes_coord)
     coord_group.permissions.set(coord_perms)
 
-    prof_perms = Permission.objects.filter(codename__in=['view_agendamento','view_aluno','change_agendamento'])
+    prof_perms = Permission.objects.filter(codename__in=['view_agendamento','view_aluno','change_agendamento',])
     prof_group.permissions.set(prof_perms)
 
     Diretoria_group.permissions.set(Permission.objects.all())

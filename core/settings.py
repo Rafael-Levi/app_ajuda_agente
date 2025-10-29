@@ -1,6 +1,7 @@
 from pathlib import Path
 import os
-import dj_database_url  
+import dj_database_url
+from django.shortcuts import render  
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -82,6 +83,11 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # LOGIN SETTINGS
+
+from django.core.exceptions import PermissionDenied
+
+def handler403(request, exception=None):
+    return render(request, "errors/403.html", status=403)
 
 LOGIN_URL = 'login:login'
 LOGIN_REDIRECT_URL = 'agendamentos:home'
