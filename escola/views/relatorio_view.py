@@ -12,7 +12,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from escola.forms.relatorio_form import RelatorioForm
 from escola.models.agendamento import Agendamento
 
-# =============== AUXILIAR DE PARSE DE DATAS ===============
+#PARSE DE DATAS 
 def _parse_date(date_str):
     """
     Converte string de data (YYYY-MM-DD) ou ISO datetime em datetime.date.
@@ -29,9 +29,9 @@ def _parse_date(date_str):
             return None
 
 
-# =========================================================
-# =============== GERADOR DE DADOS DO RELATÓRIO ============
-# =========================================================
+
+# GERAR DE DADOS DO RELATÓRIO
+
 def _generate_report_data(start_date, end_date):
     """
     Gera os dados (em estruturas simples: dicts/listas) usados no template e no XLSX.
@@ -39,7 +39,6 @@ def _generate_report_data(start_date, end_date):
     Retorna dict com chaves:
       resumo, by_professor, by_aluno, by_conteudo, monthly, agendamentos_rows
     """
-    # Normaliza datas com fallback de 30 dias
     if not start_date and not end_date:
         end_dt = timezone.localdate()
         start_dt = end_dt - pd.Timedelta(days=30)
@@ -47,16 +46,13 @@ def _generate_report_data(start_date, end_date):
         end_dt = end_date or timezone.localdate()
         start_dt = start_date or (end_dt - pd.Timedelta(days=30))
 
-    # Converte para datetimes (início do dia / fim do dia)
     start_dt_dt = datetime.combine(start_dt, time.min)
     end_dt_dt = datetime.combine(end_dt, time.max)
 
-    # Tenta tornar timezone-aware se for possível (mantendo compatibilidade)
     try:
         start_dt_dt = timezone.make_aware(start_dt_dt)
         end_dt_dt = timezone.make_aware(end_dt_dt)
     except Exception:
-        # Se já estiver aware ou não for possível, segue com os valores originais
         pass
 
     qs = (
@@ -88,7 +84,6 @@ def _generate_report_data(start_date, end_date):
 
     df = pd.DataFrame(rows)
     if df.empty:
-        # Garante as colunas para evitar KeyError em operações seguintes
         df = pd.DataFrame(
             columns=[
                 "id",
@@ -105,7 +100,7 @@ def _generate_report_data(start_date, end_date):
             ]
         )
 
-    # --- Cálculos e transformações ---
+    # Cálculos e transformações
     df["duracao_horas"] = df["duracao_minutos"].fillna(0) / 60
     df["inicio"] = pd.to_datetime(df["inicio"], errors="coerce").dt.tz_localize(None)
     df["mes"] = df["inicio"].dt.to_period("M").astype(str)
@@ -151,7 +146,6 @@ def _generate_report_data(start_date, end_date):
         "media_duracao_min": round(float(media_duracao or 0), 1),
     }
 
-    # Converte para listas de dicts (fácil render no template / JSON)
     def df_to_list(df_obj, cols=None):
         if df_obj is None:
             return []
@@ -169,9 +163,9 @@ def _generate_report_data(start_date, end_date):
     }
 
 
-# =========================================================
-# =============== VIEW HTML (INTERFACE) ===================
-# =========================================================
+
+# INTERFACE
+
 @login_required
 @permission_required("escola.view_relatorio", raise_exception=True)
 def relatorio_conteudos(request):
@@ -203,9 +197,8 @@ def relatorio_conteudos(request):
     return render(request, "relatorio/relatorio_conteudos.html", context)
 
 
-# =========================================================
-# =============== ENDPOINT JSON (AJAX) ====================
-# =========================================================
+
+# ENDPOINT
 @login_required
 @permission_required("escola.export_relatorio", raise_exception=True)
 def relatorio_conteudos_json(request):
@@ -223,9 +216,9 @@ def relatorio_conteudos_json(request):
     return JsonResponse(report, safe=False)
 
 
-# =========================================================
-# =============== EXPORTAÇÃO EXCEL (USANDO HELPER) ========
-# =========================================================
+
+# EXPORTAÇÃO EXCEL 
+
 @login_required
 @permission_required("escola.view_agendamento", raise_exception=True)
 def export_relatorio_excel(request):
@@ -238,21 +231,15 @@ def export_relatorio_excel(request):
     start_date = _parse_date(start_param)
     end_date = _parse_date(end_param)
 
-    # Reutiliza o helper para obter os dataframes/strutures
-    # Precisamos recriar os DataFrames originais para salvar no Excel (usaremos os dados brutos)
     report_data = _generate_report_data(start_date, end_date)
 
-    # Reconstruir DataFrames a partir das listas de dict (p/ escrita no Excel).
-    # Observação: em projetos grandes pode ser melhor exportar direto do DF original.
     resumo_df = pd.DataFrame([report_data["resumo"]])
     by_prof_df = pd.DataFrame(report_data["by_professor"])
     by_aluno_df = pd.DataFrame(report_data["by_aluno"])
     by_conteudo_df = pd.DataFrame(report_data["by_conteudo"])
     monthly_df = pd.DataFrame(report_data["monthly"])
 
-    # Agendamentos (rows)
     agendamentos_df = pd.DataFrame(report_data["agendamentos_rows"])
-    # Garante colunas na ordem desejada
     desired_cols = [
         "id",
         "inicio",
@@ -278,7 +265,6 @@ def export_relatorio_excel(request):
         monthly_df.to_excel(writer, sheet_name="Mensal", index=False)
 
     buffer.seek(0)
-    # Nome do arquivo com datas mais legíveis
     start_label = start_date or timezone.localdate()
     end_label = end_date or timezone.localdate()
     filename = f"relatorio_agendamentos_{start_label}_{end_label}.xlsx"

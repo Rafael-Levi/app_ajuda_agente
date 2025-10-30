@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const loading = document.getElementById("loading");
   const exportBtn = document.getElementById("export-btn");
 
-  // Envio do formulário via AJAX
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -18,7 +17,6 @@ document.addEventListener("DOMContentLoaded", function () {
     gerarRelatorio(start, end);
   });
 
-  // Função principal para buscar dados do relatório
   function gerarRelatorio(start, end) {
     loading.style.display = "block";
 
@@ -36,9 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // Atualiza o conteúdo das abas com os dados retornados
   function atualizarConteudo(data) {
-    // Aba Resumo
     const r = data.resumo;
     document.getElementById("resumo-content").innerHTML = `
       <div class="card card-body shadow-sm">
@@ -49,14 +45,12 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>
     `;
 
-    // Abas de dados detalhados
     renderTabela("professor-content", data.by_professor, ["professor", "agendamentos", "horas"]);
     renderTabela("aluno-content", data.by_aluno, ["aluno", "agendamentos", "horas"]);
     renderTabela("conteudo-content", data.by_conteudo, ["conteudo", "agendamentos", "horas"]);
     renderTabela("mensal-content", data.monthly, ["mes", "agendamentos", "horas"]);
   }
 
-  // Função genérica para renderizar tabelas dinâmicas
   function renderTabela(containerId, lista, colunas) {
     const container = document.getElementById(containerId);
 

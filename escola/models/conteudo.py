@@ -3,7 +3,7 @@ from django.db import models
 class Conteudo(models.Model):
     nome = models.CharField(max_length=100)
     descricao = models.TextField()
-    duracao_minutos = models.PositiveIntegerField(default=60)  # duração padrão
+    duracao_minutos = models.PositiveIntegerField(default=60)
     descritor = models.CharField(max_length=100, blank=True, null=True)
 
 
