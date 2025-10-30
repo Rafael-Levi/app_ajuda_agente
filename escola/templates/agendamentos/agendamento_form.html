@@ -19,6 +19,40 @@
                 
                 <div class="mb-3">
                     {{ form.as_p }}
+
+                    <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const serieSelect = document.querySelector("select[name='serie']");
+                        const turnoSelect = document.querySelector("select[name='turno']");
+                        const alunoSelect = document.querySelector("select[name='aluno']");
+
+                        function atualizarAlunos() {
+                            const serie = serieSelect.value;
+                            const turno = turnoSelect.value;
+
+                            if (!serie || !turno) {
+                                alunoSelect.innerHTML = "<option value=''>Selecione a série e o turno primeiro</option>";
+                                return;
+                            }
+
+                            fetch(`{% url 'alunos:ajax_load_alunos' %}?serie=${serie}&turno=${turno}`)
+                                .then(response => response.json())
+                                .then(data => {
+                                    alunoSelect.innerHTML = "";
+                                    data.forEach(aluno => {
+                                        const option = document.createElement("option");
+                                        option.value = aluno.id;
+                                        option.textContent = aluno.nome;
+                                        alunoSelect.appendChild(option);
+                                    });
+                                });
+                        }
+
+                        serieSelect.addEventListener("change", atualizarAlunos);
+                        turnoSelect.addEventListener("change", atualizarAlunos);
+                    });
+                    </script>
+
                 </div>
 
                 <div class="d-flex justify-content-end gap-2">

@@ -2,6 +2,26 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, permission_required
 from ..models.agendamento import Aluno
 from ..forms.aluno_form import AlunoForm
+from django.http import JsonResponse
+from ..models.aluno import Aluno
+
+@login_required
+def alunos_json(request):
+    """
+    GET params: serie (ex: '1'), turno ('M' ou 'T')
+    Retorna JSON list: [{ 'id': 1, 'nome': 'Fulano' }, ...]
+    """
+    serie = request.GET.get("serie")
+    turno = request.GET.get("turno")
+
+    qs = Aluno.objects.all()
+    if serie:
+        qs = qs.filter(serie=serie)
+    if turno:
+        qs = qs.filter(turno=turno)
+    qs = qs.order_by("nome").values("id", "nome")
+
+    return JsonResponse(list(qs), safe=False)
 
 @login_required
 @permission_required('escola.add_aluno', raise_exception=True)

@@ -69,6 +69,16 @@ class AgendamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateV
     template_name = 'agendamentos/agendamento_form.html'
     success_url = reverse_lazy('agendamentos:list')
 
+    def get_form(self, form_class=None):
+        """
+        Garante que o form receba request.GET para pré-filtrar alunos
+        caso AJAX ou redirecionamento preserve filtros na URL.
+        """
+        form = super().get_form(form_class)
+        form.data = self.request.POST or self.request.GET
+        return form
+
+
 
 class AgendamentoUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'escola.change_agendamento'
