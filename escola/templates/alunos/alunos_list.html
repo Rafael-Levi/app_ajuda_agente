@@ -14,21 +14,24 @@
             <thead class="table-primary">
                 <tr>
                     <th>Nome</th>
-                    <th>Telefone</th>
-                    <th>Email</th>
+                    <th>Serie</th>
+                    <th>Turno</th>
                     <th class="text-center">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for aluno in alunos %}
                 <tr>
-                    <td>{{ Aluno.nome }}</td>
-                    <td>{{ Aluno.telefone }}</td>
-                    <td>{{ Aluno.email }}</td>
+                    <td>{{ aluno.nome }}</td>
+                    <td>{{ aluno.serie }}</td>
+                    <td>{{ aluno.turno }}</td>
                     <td class="text-center">
-                        <a href="{% url 'alunos:aluno_edit' aluno.pk %}" class="btn btn-sm btn-warning">
-                            <i class="bi bi-pencil-fill"></i> Editar
-                        </a>
+                        <form action="{% url 'alunos:aluno_edit' aluno.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-warning">
+                                <i class="bi bi-pencil-fill"></i> Editar
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% empty %}

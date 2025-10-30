@@ -6,12 +6,6 @@ from .conteudo import Conteudo
 from .professor import Professor
 
 class Agendamento(models.Model):
-    class Meta:
-        permissions = [
-            ("view_relatorio", "Pode visualizar relatórios"),
-            ("export_relatorio", "Pode exportar relatórios"),
-        ]
-
     STATUS_AGENDADO = 'AGENDADO'
     STATUS_CONCLUIDO = 'CONCLUIDO'
     STATUS_CANCELADO = 'CANCELADO'
@@ -33,6 +27,11 @@ class Agendamento(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
+        permissions = [
+            ("view_relatorio", "Pode visualizar relatórios"),
+            ("export_relatorio", "Pode exportar relatórios"),
+        ]
+        
         ordering = ['-inicio']
         indexes = [
             models.Index(fields=['inicio']),

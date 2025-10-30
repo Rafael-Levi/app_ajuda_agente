@@ -3,8 +3,8 @@ from .models import agendamento, aluno, conteudo, professor
 
 @admin.register(aluno.Aluno)
 class AlunoAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nome', 'serie', 'turma','telefone')
-    search_fields = ('nome', 'serie', 'turma',"telefone")
+    list_display = ('id', 'nome', 'serie', 'turno','telefone')
+    search_fields = ('nome', 'serie', 'turno',"telefone")
 
 
 @admin.register(conteudo.Conteudo)

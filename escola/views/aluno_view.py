@@ -18,12 +18,12 @@ def aluno_create(request):
 @login_required
 @permission_required('escola.change_aluno', raise_exception=True)
 def aluno_edit(request, pk):
-    aluno = get_object_or_404(aluno, pk=pk)
+    aluno = get_object_or_404(Aluno, pk=pk)
     if request.method == 'POST':
         form = AlunoForm(request.POST, instance=aluno)
         if form.is_valid():
             form.save()
-            return redirect('alunos_list')
+            return redirect('alunos:alunos_list')
     else:
         form = AlunoForm(instance=aluno)
     return render(request, 'alunos/aluno_form.html', {'form': form, 'title': 'Editar aluno'})
