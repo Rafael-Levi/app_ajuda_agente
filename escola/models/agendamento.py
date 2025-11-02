@@ -18,7 +18,7 @@ class Agendamento(models.Model):
     aluno = models.ForeignKey(Aluno, on_delete=models.CASCADE, related_name='agendamentos')
     conteudo = models.ForeignKey(Conteudo, on_delete=models.PROTECT, related_name='agendamentos')
     professor = models.ForeignKey(Professor, on_delete=models.PROTECT, related_name='agendamentos')
-    inicio = models.DateTimeField()  # data e hora de início
+    inicio = models.DateTimeField()
     duracao_minutos = models.PositiveIntegerField(help_text='Duração em minutos', null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_AGENDADO)
     observacoes = models.TextField(blank=True)
@@ -52,23 +52,25 @@ class Agendamento(models.Model):
             self.duracao_minutos = self.conteudo.duracao_minutos
 
         inicio = self.inicio
-        fim = self.fim
-        
-        window_start = inicio - timedelta(minutes=240)
-        window_end = fim + timedelta(minutes=240)
+        fim = self.fim  
 
-        candidates = Agendamento.objects.filter(
-            professor=self.professor,
-            inicio__lt=window_end,
-            inicio__gte=window_start
-        ).exclude(pk=self.pk).filter(status__in=[self.STATUS_AGENDADO, self.STATUS_CONCLUIDO])
+        conflitos = Agendamento.objects.filter(
+            aluno=self.aluno,
+            status__in=[self.STATUS_AGENDADO, self.STATUS_CONCLUIDO],
+            inicio__lt=fim,
+            inicio__gt=inicio - timedelta(minutes=self.duracao_minutos)
+        ).exclude(pk=self.pk)
 
-        for other in candidates:
+        for other in conflitos:
             other_dur = other.duracao_minutos or other.conteudo.duracao_minutos
             other_start = other.inicio
             other_end = other_start + timedelta(minutes=other_dur)
+
             if (inicio < other_end) and (other_start < fim):
-                raise ValidationError("Conflito de horário: o professor já está ocupado nesse período.")
+                raise ValidationError(
+                    f"Este aluno já possui um atendimento nesse horário com o professor "
+                    f"{other.professor.nome} ({other_start.strftime('%H:%M')} - {other_end.strftime('%H:%M')})."
+                )
 
     def save(self, *args, **kwargs):
         self.full_clean()
