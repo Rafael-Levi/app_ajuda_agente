@@ -69,14 +69,13 @@ class AgendamentoCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateV
     template_name = 'agendamentos/agendamento_form.html'
     success_url = reverse_lazy('agendamentos:list')
 
-    def get_form(self, form_class=None):
-        """
-        Garante que o form receba request.GET para pré-filtrar alunos
-        caso AJAX ou redirecionamento preserve filtros na URL.
-        """
-        form = super().get_form(form_class)
-        form.data = self.request.POST or self.request.GET
-        return form
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self,form):
+        return super().form_valid(form)
 
 
 
@@ -119,7 +118,7 @@ def alterar_status_agendamento(request, pk):
     agendamento = get_object_or_404(Agendamento, pk=pk)
     user = request.user
 
-    if user.groups.filter(name='professor').exists():
+    if user.groups.filter(name='Professor').exists():
         try:
             prof = Professor.objects.get(user=user)
         except Professor.DoesNotExist:

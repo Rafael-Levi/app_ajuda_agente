@@ -1,5 +1,5 @@
 from django import forms
-from ..models import agendamento, aluno as aluno_model
+from ..models import agendamento, professor, aluno  as aluno_model
 
 class AgendamentoForm(forms.ModelForm):
     SERIE_CHOICES = [
@@ -28,8 +28,12 @@ class AgendamentoForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+        if user and user.groups.filter(name="Professor").exists():
+            self.fields['professor'].queryset = professor.Professor.objects.filter(user=user)
+        
         self.fields['aluno'].queryset = aluno_model.Aluno.objects.none()
 
         serie = self.data.get('serie') or self.initial.get('serie') or None
