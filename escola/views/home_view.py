@@ -6,6 +6,7 @@ from django.urls import reverse_lazy
 from ..models.agendamento import Agendamento, Professor
 from ..forms.agendamento_form import AgendamentoForm
 from django.http import HttpResponseBadRequest
+from django.utils import timezone
 
 @login_required
 def home(request):
@@ -16,7 +17,9 @@ def home(request):
 
     if user.groups.filter(name="Coordenação").exists():
         agendamentos = Agendamento.objects.select_related('aluno', 'conteudo', 'professor').all()
-        return render(request, 'home/home_coordenacao.html', {'agendamentos': agendamentos})
+        today = timezone.localdate()
+        filtro = agendamentos.filter(inicio__date__gte=today, aluno__is_active=True)
+        return render(request, 'home/home_coordenacao.html', {'agendamentos': filtro})
 
     if user.groups.filter(name="Professor").exists():
         prof = None
@@ -30,7 +33,8 @@ def home(request):
                 prof = None
 
         if prof:
-            agendamentos = Agendamento.objects.select_related('aluno', 'conteudo').filter(professor=prof)
+            today = timezone.localdate()
+            agendamentos = Agendamento.objects.select_related('aluno', 'conteudo').filter(professor=prof,inicio__date__gte=today, aluno__is_active=True)
         else:
             agendamentos = Agendamento.objects.none()
         return render(request, 'home/home_professor.html', {'agendamentos': agendamentos, 'professor': prof})

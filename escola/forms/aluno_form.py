@@ -1,7 +1,10 @@
 from django import forms
-from ..models import aluno
+from ..models.aluno import Aluno
 
 class AlunoForm(forms.ModelForm):
     class Meta:
-        model = aluno.Aluno
-        fields = ['nome','telefone','serie','turno']
+        model = Aluno
+        fields = ['nome','telefone','serie','turno','is_active']
+        labels={
+            Aluno.is_active:'Aluno ativo'
+        }

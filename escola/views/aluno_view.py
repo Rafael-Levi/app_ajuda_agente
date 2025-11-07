@@ -14,7 +14,7 @@ def alunos_json(request):
     serie = request.GET.get("serie")
     turno = request.GET.get("turno")
 
-    qs = Aluno.objects.all()
+    qs = Aluno.objects.all().filter(Aluno.is_active==True)
     if serie:
         qs = qs.filter(serie=serie)
     if turno:

@@ -16,6 +16,7 @@
                     <th>Nome</th>
                     <th>Serie</th>
                     <th>Turno</th>
+                    <th>Ativo</th>
                     <th class="text-center">Ações</th>
                 </tr>
             </thead>
@@ -25,6 +26,7 @@
                     <td>{{ aluno.nome }}</td>
                     <td>{{ aluno.serie }}</td>
                     <td>{{ aluno.turno }}</td>
+                    <td>{% if aluno.is_active %}Ativo{% else %}Inativo{% endif %}</td>
                     <td class="text-center">
                         <form action="{% url 'alunos:aluno_edit' aluno.pk %}" method="post" style="display:inline;">
                             {% csrf_token %}
